@@ -1,0 +1,18 @@
+{
+    "label": "Test homepage",
+    "menu" : [
+        {
+            "label" : "Home",
+            "url" : "/"
+        },
+        {
+            "label": "About",
+            "url": "/about"
+        }
+    ],
+    "postsPerPage": 3,
+    "previewLength": 15,
+    "sourcePath": "./source",
+    "resultPath": "./result",
+    "url": "https://domain.com"
+}

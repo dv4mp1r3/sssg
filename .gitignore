@@ -1,0 +1,5 @@
+source
+result
+*.json
+vendor
+._.DS_Store
