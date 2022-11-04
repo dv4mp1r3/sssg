@@ -2,4 +2,4 @@ source
 result
 *.json
 vendor
-._.DS_Store
+.DS_Store
