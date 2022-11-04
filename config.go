@@ -11,13 +11,14 @@ type menuElement struct {
 }
 
 type Config struct {
-	Label        string
-	Menu         []menuElement
-	PostsPerPage int
-	SourcePath   string
-	ResultPath   string
-	StaticPath   string
-	Url          string
+	Label         string
+	Menu          []menuElement
+	PostsPerPage  int
+	PreviewLength int
+	SourcePath    string
+	ResultPath    string
+	StaticPath    string
+	Url           string
 }
 
 func validateConfig(c *Config) bool {

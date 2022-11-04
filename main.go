@@ -16,6 +16,8 @@ import (
 	"github.com/gomarkdown/markdown/ast"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
+	"github.com/microcosm-cc/bluemonday"
+	"github.com/mitchellh/go-wordwrap"
 )
 
 func main() {
@@ -96,12 +98,13 @@ func main() {
 		if currentPage > 0 {
 			pageName = fmt.Sprint(currentPage + 1)
 		}
+		pageUrls := genPageUrls(pages, currentPage)
 		currentPage++
 		genPaginationPages(
 			pageName,
 			pageTemplate,
 			&pagePosts,
-			currentPage,
+			&pageUrls,
 			&c,
 		)
 
@@ -113,29 +116,48 @@ func main() {
 
 }
 
-func genPaginationPages(pageName string, pageTemplate string, posts *[]Post, currentPage int, c *Config) {
+func genPageUrls(pageCount int, currentPage int) string {
+	//todo: implement
+	return ""
+}
+
+func genPreviewText(postContent string, c *Config) string {
+	if len(postContent) == 0 {
+		return ""
+	}
+	p := bluemonday.StrictPolicy()
+	tmp := wordwrap.WrapString(p.Sanitize(postContent), uint(c.PreviewLength))
+	if len(tmp) == 0 {
+		return ""
+	}
+	return strings.Split(tmp, "\n")[0]
+}
+
+func genPaginationPages(pageName string, pageTemplate string, posts *[]Post, pageUrls *string, c *Config) {
 	cStr := "{{.content}}"
-	previews := ""
+	divs := ""
 	for _, post := range *posts {
 		if len(post.Content) == 0 {
 			continue
 		}
 		divContent := createPage(c, "pagination", false)
-		contentAsRune := []rune(post.Content)
 		contentIndex := strings.Index(divContent, cStr)
 		if contentIndex >= 0 {
-			//todo: strip tags and replace by words
-			previewText := string(contentAsRune[0:5]) + "..."
-			previewText = ReplaceAtIndex(divContent, []rune(previewText), contentIndex, len(cStr))
-			previews += previewText
-			previews += "\n"
+			previewText := genPreviewText(post.Content, c)
+			divContent = ReplaceAtIndex(divContent, []rune(previewText), contentIndex, len(cStr))
+			divs += divContent
+			divs += "\n"
 		}
 	}
 
-	if len(previews) > 0 {
+	if pageUrls != nil && len(*pageUrls) > 0 {
+		divs += *pageUrls
+	}
+
+	if len(divs) > 0 {
 		contentIndex := strings.Index(pageTemplate, cStr)
 		if contentIndex >= 0 {
-			pageContent := ReplaceAtIndex(pageTemplate, []rune(previews), contentIndex, len(cStr))
+			pageContent := ReplaceAtIndex(pageTemplate, []rune(divs), contentIndex, len(cStr))
 			pagePath := path.Join(c.ResultPath, pageName+".html")
 			err := os.WriteFile(pagePath, []byte(pageContent), 0644)
 			if err != nil {
