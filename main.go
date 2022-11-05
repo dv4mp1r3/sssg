@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"html/template"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -38,7 +40,7 @@ func main() {
 	var categories []Category
 
 	templateName := "page"
-	pageTemplate := createPage(&c, templateName, true)
+	pageTemplate := createPage(&c, templateName, true, nil)
 
 	var posts []Post
 	err = getPosts(&posts, filepath.Join(c.SourcePath, "content"), []string{}, 3, 1)
@@ -140,7 +142,7 @@ func genPaginationPages(pageName string, pageTemplate string, posts *[]Post, pag
 		if len(post.Content) == 0 {
 			continue
 		}
-		divContent := createPage(c, "pagination", false)
+		divContent := createPage(c, "pagination", false, nil)
 		contentIndex := strings.Index(divContent, cStr)
 		if contentIndex >= 0 {
 			previewText := genPreviewText(post.Content, c)
@@ -185,8 +187,14 @@ func renderHookDropCodeBlock(w io.Writer, node ast.Node, entering bool) (ast.Wal
 	return ast.GoToNext, true
 }
 
-func createPage(c *Config, templateName string, isIndexPage bool) string {
+func createPage(c *Config, templateName string, isIndexPage bool, data any) string {
+	const fileDelemiter = "file_"
 	pageContent := ""
+	//
+	if strings.Index(templateName, fileDelemiter) == 0 {
+		_, templateName, _ = strings.Cut(templateName, fileDelemiter)
+	}
+	//
 	fp := filepath.Join(c.SourcePath, templateName+".html")
 	templateContent := readTemplate(&fp, &templateName)
 	templateObject := template.New(templateName)
@@ -196,17 +204,26 @@ func createPage(c *Config, templateName string, isIndexPage bool) string {
 		for idx, str := range l {
 			str = strings.Replace(strings.TrimSpace(str), "{{.", "", 1)
 			str = strings.Replace(str, "}}", "", 1)
-			if len(str) == 0 {
+			if len(str) == 0 && strings.Index(str, fileDelemiter) != 0 {
 				continue
 			}
+			//
 			if str != "content" && str != "url" {
-				includedContent := createPage(c, str, false)
+				includedContent := createPage(c, str, false, data)
 				pageContent = strings.ReplaceAll(pageContent, l[idx], includedContent)
 			}
 		}
 	}
 
-	return pageContent
+	if data == nil || reflect.ValueOf(data).Kind() == reflect.Invalid {
+		return pageContent
+	} else {
+		templateObject = template.Must(templateObject.Parse(pageContent))
+		var b bytes.Buffer
+		templateObject.Execute(&b, data)
+		return b.String()
+	}
+
 }
 
 func genPostHtml(postPageMd *string) string {
