@@ -12,18 +12,26 @@ type PaginationElement struct {
 	Preview string
 }
 
+type pData struct {
+	PaginationData string
+	DrawPagination bool
+}
+
 func GenPaginationPages(pageName string, pageTemplate string, posts *[]Post, pageUrls *string, c *Config) {
-	cStr := "{{.content}}"
+
 	divs := ""
+	const templateName = "pagination"
+	var m = make(map[string]any)
 	for _, post := range *posts {
 		if len(post.Content) == 0 {
 			continue
 		}
-		divContent := CreatePage(c, "pagination", false, nil)
-		contentIndex := strings.Index(divContent, cStr)
+		m[templateName] = post
+		divContent := CreatePageFromFile(c, templateName, false, m)
+		contentIndex := strings.Index(divContent, post.Content)
 		if contentIndex >= 0 {
 			previewText := GenPreviewText(post.Content, c)
-			divContent = ReplaceAtIndex(divContent, []rune(previewText), contentIndex, len(cStr))
+			divContent = ReplaceAtIndex(divContent, []rune(previewText), contentIndex, len(post.Content))
 			divs += divContent
 			divs += "\n"
 		}
@@ -33,16 +41,11 @@ func GenPaginationPages(pageName string, pageTemplate string, posts *[]Post, pag
 		divs += *pageUrls
 	}
 
-	if len(divs) > 0 {
-		contentIndex := strings.Index(pageTemplate, cStr)
-		if contentIndex >= 0 {
-			pageContent := ReplaceAtIndex(pageTemplate, []rune(divs), contentIndex, len(cStr))
-			pagePath := path.Join(c.ResultPath, pageName+".html")
-			err := os.WriteFile(pagePath, []byte(pageContent), 0644)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-		}
+	m[templateName] = pData{DrawPagination: true, PaginationData: divs}
+	pageContent := CreatePage(c, templateName, pageTemplate, false, m)
+	pagePath := path.Join(c.ResultPath, pageName+".html")
+	err := os.WriteFile(pagePath, []byte(pageContent), 0644)
+	if err != nil {
+		fmt.Println(err)
 	}
 }

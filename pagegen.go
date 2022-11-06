@@ -2,12 +2,13 @@ package main
 
 import (
 	"bytes"
-	"html/template"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
+	"text/template"
 	"text/template/parse"
+	"unicode"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/mitchellh/go-wordwrap"
@@ -62,16 +63,16 @@ func GenPreviewText(postContent string, c *Config) string {
 	return strings.Split(tmp, "\n")[0]
 }
 
-func CreatePage(c *Config, templateName string, isIndexPage bool, data any) string {
-	const fileDelemiter = "file_"
-	pageContent := ""
-	//
-	if strings.Index(templateName, fileDelemiter) == 0 {
-		_, templateName, _ = strings.Cut(templateName, fileDelemiter)
-	}
-	//
+func CreatePageFromFile(c *Config, templateName string, isIndexPage bool, data map[string]any) string {
 	fp := filepath.Join(c.SourcePath, templateName+".html")
 	templateContent := readTemplate(&fp, &templateName)
+
+	return CreatePage(c, templateName, templateContent, isIndexPage, data)
+
+}
+
+func CreatePage(c *Config, templateName string, templateContent string, isIndexPage bool, data map[string]any) string {
+	pageContent := ""
 	templateObject := template.New(templateName)
 	pageContent = templateContent
 	if templateContent != "" {
@@ -79,12 +80,12 @@ func CreatePage(c *Config, templateName string, isIndexPage bool, data any) stri
 		for idx, str := range l {
 			str = strings.Replace(strings.TrimSpace(str), "{{.", "", 1)
 			str = strings.Replace(str, "}}", "", 1)
-			if len(str) == 0 && strings.Index(str, fileDelemiter) != 0 {
+			if len(str) == 0 {
 				continue
 			}
 			//
-			if str != "content" && str != "url" {
-				includedContent := CreatePage(c, str, false, data)
+			if unicode.IsLower(rune(str[0])) {
+				includedContent := CreatePageFromFile(c, str, false, data)
 				pageContent = strings.ReplaceAll(pageContent, l[idx], includedContent)
 			}
 		}
@@ -93,9 +94,13 @@ func CreatePage(c *Config, templateName string, isIndexPage bool, data any) stri
 	if data == nil || reflect.ValueOf(data).Kind() == reflect.Invalid {
 		return pageContent
 	} else {
+		_, ok := data[templateName]
+		if !ok {
+			return pageContent
+		}
 		templateObject = template.Must(templateObject.Parse(pageContent))
 		var b bytes.Buffer
-		templateObject.Execute(&b, data)
+		templateObject.Execute(&b, data[templateName])
 		return b.String()
 	}
 

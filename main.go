@@ -103,7 +103,7 @@ func main() {
 	var categories []Category
 
 	templateName := "page"
-	pageTemplate := CreatePage(&c, templateName, true, nil)
+	pageTemplate := CreatePageFromFile(&c, templateName, true, nil)
 
 	var posts []Post
 	err := getPosts(&posts, filepath.Join(c.SourcePath, "content"), []string{}, 3, 1)
