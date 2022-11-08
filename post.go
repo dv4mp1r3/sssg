@@ -25,6 +25,12 @@ type Post struct {
 	Content string
 }
 
+type PageData struct {
+	DrawPagination bool
+	Content        string
+	Menu           string
+}
+
 func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLevel int) error {
 
 	f, err := os.Open(root)
@@ -77,9 +83,9 @@ func GenFullDestPath(c *Config, post *Post) string {
 }
 
 func GenPostHtml(postPageMd *string) string {
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.FencedCode
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
 	opts := html.RendererOptions{
-		Flags:          html.CommonFlags,
+		Flags:          html.UseXHTML,
 		RenderNodeHook: renderHookDropCodeBlock,
 	}
 	parser := parser.NewWithExtensions(extensions)
@@ -89,20 +95,20 @@ func GenPostHtml(postPageMd *string) string {
 }
 
 func renderHookDropCodeBlock(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
-	// skip all nodes that are not CodeBlock nodes
-	n, ok := node.(*ast.CodeBlock)
-	if n != nil {
-		fmt.Println(n.Content)
-	}
-
-	if !ok {
+	//todo: implement
+	n, ok_n := node.(*ast.Link)
+	if n != nil && ok_n {
+		fmt.Println(string(n.Destination))
 		return ast.GoToNext, false
 	}
 
-	// custom rendering logic for ast.CodeBlock. By doing nothing it won't be
-	// present in the output
+	i, ok_i := node.(*ast.Image)
+	if i != nil && ok_i {
+		fmt.Println(string(i.Destination))
+		return ast.GoToNext, false
+	}
 
-	return ast.GoToNext, true
+	return ast.GoToNext, false
 }
 
 func GenPostUrl(c *Config, destPath *string) string {

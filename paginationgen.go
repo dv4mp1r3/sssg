@@ -15,6 +15,8 @@ type PaginationElement struct {
 type pData struct {
 	PaginationData string
 	DrawPagination bool
+	Menu           string
+	Content        string
 }
 
 func GenPaginationPages(pageName string, pageTemplate string, posts *[]Post, pageUrls *string, c *Config) {
@@ -41,7 +43,8 @@ func GenPaginationPages(pageName string, pageTemplate string, posts *[]Post, pag
 		divs += *pageUrls
 	}
 
-	m[templateName] = pData{DrawPagination: true, PaginationData: divs}
+	//todo: redo
+	m[templateName] = pData{DrawPagination: true, PaginationData: "", Menu: "", Content: divs}
 	pageContent := CreatePage(c, templateName, pageTemplate, false, m)
 	pagePath := path.Join(c.ResultPath, pageName+".html")
 	err := os.WriteFile(pagePath, []byte(pageContent), 0644)

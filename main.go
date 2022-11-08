@@ -65,10 +65,10 @@ func writePost(post *Post, categories *[]Category, c *Config, pageTemplate *stri
 		return post
 	}
 
-	//todo: fix
 	_html := GenPostHtml(&cnt)
-	postPage := strings.Replace(*pageTemplate, "{{.content}}", _html, 1)
-	//todo: generate internal urls
+	m := make(map[string]any)
+	m["post"] = PageData{DrawPagination: false, Content: _html, Menu: ""}
+	postPage := CreatePage(c, "post", *pageTemplate, false, m)
 
 	destPath := GenFullDestPath(c, post)
 	err := os.MkdirAll(destPath, 0755)
