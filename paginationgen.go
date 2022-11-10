@@ -5,6 +5,8 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	"github.com/dv4mp1r3/sssg/config"
 )
 
 type PaginationElement struct {
@@ -19,7 +21,7 @@ type pData struct {
 	Content        string
 }
 
-func GenPaginationPages(pageName string, pageTemplate string, posts *[]Post, pageUrls *string, c *Config) {
+func GenPaginationPages(pageName string, pageTemplate string, posts *[]Post, pageUrls *string, c *config.Config) {
 
 	divs := ""
 	const templateName = "pagination"

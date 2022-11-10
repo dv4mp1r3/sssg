@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dv4mp1r3/sssg/config"
+
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/ast"
 	"github.com/gomarkdown/markdown/html"
@@ -73,12 +75,12 @@ func joinFolders(p *Post) string {
 	return res
 }
 
-func GenFullSourcePath(c *Config, post *Post) string {
+func GenFullSourcePath(c *config.Config, post *Post) string {
 	res := path.Join(c.SourcePath, "content", joinFolders(post))
 	return path.Join(res, post.Path)
 }
 
-func GenFullDestPath(c *Config, post *Post) string {
+func GenFullDestPath(c *config.Config, post *Post) string {
 	return path.Join(c.ResultPath, joinFolders(post))
 }
 
@@ -95,23 +97,47 @@ func GenPostHtml(postPageMd *string) string {
 }
 
 func renderHookDropCodeBlock(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
-	//todo: implement
 	n, ok_n := node.(*ast.Link)
 	if n != nil && ok_n {
-		fmt.Println(string(n.Destination))
+		tmp := fixInternalUrls(&n.Destination)
+		n.Destination = tmp
 		return ast.GoToNext, false
 	}
 
 	i, ok_i := node.(*ast.Image)
 	if i != nil && ok_i {
-		fmt.Println(string(i.Destination))
+		i.Destination = fixInternalUrls(&i.Destination)
 		return ast.GoToNext, false
 	}
 
 	return ast.GoToNext, false
 }
 
-func GenPostUrl(c *Config, destPath *string) string {
+func fixInternalUrls(destination *[]byte) []byte {
+	c, err := config.GetInstance()
+	if err != nil {
+		return *destination
+	}
+	_url := string(*destination)
+	if strings.Index(_url, "./") != 0 {
+		return *destination
+	}
+
+	mdExtIndex := strings.LastIndex(_url, ".md")
+
+	if mdExtIndex == len(_url)-3 {
+		_url = _url[2:mdExtIndex]
+		_url += ".html"
+	}
+
+	parentDirIndex := strings.LastIndex(_url, "../")
+	if parentDirIndex != -1 {
+		_url = _url[parentDirIndex+3:]
+	}
+	return []byte(fmt.Sprint(c.Url, "/", _url))
+}
+
+func GenPostUrl(c *config.Config, destPath *string) string {
 	res := c.Url
 	tmp := c.ResultPath
 	if strings.HasPrefix(c.ResultPath, ".") {

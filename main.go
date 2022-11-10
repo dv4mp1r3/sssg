@@ -10,19 +10,19 @@ import (
 	"strings"
 
 	"github.com/dv4mp1r3/ovpngen/common"
+	"github.com/dv4mp1r3/sssg/config"
 )
 
-func processInput() Config {
+func processInput() config.Config {
 	configPath := flag.String("c", "config.json", "Config path")
 	flag.Parse()
 
 	configContent := common.ReadFile(*configPath)
-	var c Config
-	err := createConfig(configContent, &c)
+	c, err := config.CreateConfig(configContent)
 	if err != nil {
 		panic(err)
 	}
-	if !validateConfig(&c) {
+	if !config.ValidateConfig(&c) {
 		panic("Config is invalid. The programm will be stop")
 	}
 	return c
@@ -32,7 +32,7 @@ func needToAddCategory(url *string, label *string, categories *[]Category) bool 
 	return len(*url) > 0 && len(*label) > 0 && IsUniqueCategory(*categories, url)
 }
 
-func writePaginationPages(posts *[]Post, pageTemplate *string, c *Config) {
+func writePaginationPages(posts *[]Post, pageTemplate *string, c *config.Config) {
 	pages := len(*posts) / c.PostsPerPage
 	currentPage := 0
 	pageName := "index"
@@ -56,7 +56,7 @@ func writePaginationPages(posts *[]Post, pageTemplate *string, c *Config) {
 	}
 }
 
-func writePost(post *Post, categories *[]Category, c *Config, pageTemplate *string) *Post {
+func writePost(post *Post, categories *[]Category, c *config.Config, pageTemplate *string) *Post {
 	fmt.Println(post.Path)
 	fp := GenFullSourcePath(c, post)
 	cnt := common.ReadFile(fp)

@@ -10,6 +10,8 @@ import (
 	"text/template/parse"
 	"unicode"
 
+	"github.com/dv4mp1r3/sssg/config"
+
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/mitchellh/go-wordwrap"
 )
@@ -51,7 +53,7 @@ func GenPageUrls(pageCount int, currentPage int) string {
 	return ""
 }
 
-func GenPreviewText(postContent string, c *Config) string {
+func GenPreviewText(postContent string, c *config.Config) string {
 	if len(postContent) == 0 {
 		return ""
 	}
@@ -63,7 +65,7 @@ func GenPreviewText(postContent string, c *Config) string {
 	return strings.Split(tmp, "\n")[0]
 }
 
-func CreatePageFromFile(c *Config, templateName string, isIndexPage bool, data map[string]any) string {
+func CreatePageFromFile(c *config.Config, templateName string, isIndexPage bool, data map[string]any) string {
 	fp := filepath.Join(c.SourcePath, templateName+".html")
 	templateContent := readTemplate(&fp, &templateName)
 
@@ -71,7 +73,7 @@ func CreatePageFromFile(c *Config, templateName string, isIndexPage bool, data m
 
 }
 
-func CreatePage(c *Config, templateName string, templateContent string, isIndexPage bool, data map[string]any) string {
+func CreatePage(c *config.Config, templateName string, templateContent string, isIndexPage bool, data map[string]any) string {
 	pageContent := ""
 	templateObject := template.New(templateName)
 	pageContent = templateContent
