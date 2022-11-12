@@ -43,13 +43,13 @@ func writePaginationPages(posts *[]Post, pageTemplate *string, c *config.Config)
 		if currentPage > 0 {
 			pageName = fmt.Sprint(currentPage + 1)
 		}
-		pageUrls := GenPageUrls(pages, currentPage)
+		paginationElements := GenPaginationElements(pages, currentPage, c)
 		currentPage++
-		GenPaginationPages(
+		GenPreviews(
 			pageName,
 			*pageTemplate,
 			&pagePosts,
-			&pageUrls,
+			&paginationElements,
 			c,
 		)
 
