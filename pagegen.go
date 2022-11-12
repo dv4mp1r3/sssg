@@ -1,12 +1,22 @@
 package main
 
 import (
-	"html/template"
+	"bytes"
 	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"text/template"
 	"text/template/parse"
+	"unicode"
+
+	"github.com/dv4mp1r3/sssg/config"
+
+	"github.com/microcosm-cc/bluemonday"
+	"github.com/mitchellh/go-wordwrap"
 )
 
-func ListTemplFields(t *template.Template) []string {
+func listTemplFields(t *template.Template) []string {
 	return listNodeFields(t.Tree.Root, nil)
 }
 
@@ -34,6 +44,66 @@ func readTemplate(path *string, name *string) string {
 
 func parseTemplate(tObject *template.Template, tContent *string) []string {
 	t := template.Must(tObject.Parse(*tContent))
-	l := ListTemplFields(t)
+	l := listTemplFields(t)
 	return l
+}
+
+func GenPageUrls(pageCount int, currentPage int) string {
+	//todo: implement
+	return ""
+}
+
+func GenPreviewText(postContent string, c *config.Config) string {
+	if len(postContent) == 0 {
+		return ""
+	}
+	p := bluemonday.StrictPolicy()
+	tmp := wordwrap.WrapString(p.Sanitize(postContent), uint(c.PreviewLength))
+	if len(tmp) == 0 {
+		return ""
+	}
+	return strings.Split(tmp, "\n")[0]
+}
+
+func CreatePageFromFile(c *config.Config, templateName string, isIndexPage bool, data map[string]any) string {
+	fp := filepath.Join(c.SourcePath, templateName+".html")
+	templateContent := readTemplate(&fp, &templateName)
+
+	return CreatePage(c, templateName, templateContent, isIndexPage, data)
+
+}
+
+func CreatePage(c *config.Config, templateName string, templateContent string, isIndexPage bool, data map[string]any) string {
+	pageContent := ""
+	templateObject := template.New(templateName)
+	pageContent = templateContent
+	if templateContent != "" {
+		l := parseTemplate(templateObject, &templateContent)
+		for idx, str := range l {
+			str = strings.Replace(strings.TrimSpace(str), "{{.", "", 1)
+			str = strings.Replace(str, "}}", "", 1)
+			if len(str) == 0 {
+				continue
+			}
+			//
+			if unicode.IsLower(rune(str[0])) {
+				includedContent := CreatePageFromFile(c, str, false, data)
+				pageContent = strings.ReplaceAll(pageContent, l[idx], includedContent)
+			}
+		}
+	}
+
+	if data == nil || reflect.ValueOf(data).Kind() == reflect.Invalid {
+		return pageContent
+	} else {
+		_, ok := data[templateName]
+		if !ok {
+			return pageContent
+		}
+		templateObject = template.Must(templateObject.Parse(pageContent))
+		var b bytes.Buffer
+		templateObject.Execute(&b, data[templateName])
+		return b.String()
+	}
+
 }
