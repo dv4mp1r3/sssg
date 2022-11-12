@@ -34,7 +34,7 @@ func CreateConfig(s string) (Config, error) {
 	var err = json.Unmarshal([]byte(s), &c)
 
 	if err != nil {
-		fmt.Println(fmt.Sprintln("Error on createConfig %s", err))
+		fmt.Printf("Error on createConfig %s\n", err)
 		return c, err
 	}
 	return c, nil
