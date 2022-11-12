@@ -57,6 +57,7 @@ func writePaginationPages(posts *[]Post, pageTemplate *string, c *config.Config)
 }
 
 func writePost(post *Post, categories *[]Category, c *config.Config, pageTemplate *string) *Post {
+	const templateName = "post"
 	fmt.Println(post.Path)
 	fp := GenFullSourcePath(c, post)
 	cnt := common.ReadFile(fp)
@@ -67,8 +68,8 @@ func writePost(post *Post, categories *[]Category, c *config.Config, pageTemplat
 
 	_html := GenPostHtml(&cnt)
 	m := make(map[string]any)
-	m["post"] = PageData{DrawPagination: false, Content: _html, Menu: ""}
-	postPage := CreatePage(c, "post", *pageTemplate, false, m)
+	m[templateName] = PageData{DrawPagination: false, Content: _html, Menu: c.Menu}
+	postPage := CreatePage(c, templateName, *pageTemplate, false, m)
 
 	destPath := GenFullDestPath(c, post)
 	err := os.MkdirAll(destPath, 0755)
@@ -102,8 +103,7 @@ func main() {
 
 	var categories []Category
 
-	templateName := "page"
-	pageTemplate := CreatePageFromFile(&c, templateName, true, nil)
+	pageTemplate := CreatePageFromFile(&c, "page", true, nil)
 
 	var posts []Post
 	err := getPosts(&posts, filepath.Join(c.SourcePath, "content"), []string{}, 3, 1)
