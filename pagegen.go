@@ -21,7 +21,7 @@ import (
 type pData struct {
 	PaginationData string
 	DrawPagination bool
-	Menu           string
+	Menu           []config.MenuElement
 	Content        string
 }
 
@@ -78,7 +78,7 @@ func GenPreviews(pageName string, pageTemplate string, posts *[]Post, pagination
 	}
 
 	//todo: redo
-	m[templateName] = pData{DrawPagination: true, PaginationData: *paginationElements, Menu: "", Content: divs}
+	m[templateName] = pData{DrawPagination: true, PaginationData: *paginationElements, Menu: c.Menu, Content: divs}
 	pageContent := CreatePage(c, templateName, pageTemplate, false, m)
 	pagePath := path.Join(c.ResultPath, pageName+".html")
 	err := os.WriteFile(pagePath, []byte(pageContent), 0644)

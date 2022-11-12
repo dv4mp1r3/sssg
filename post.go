@@ -30,7 +30,7 @@ type Post struct {
 type PageData struct {
 	DrawPagination bool
 	Content        string
-	Menu           string
+	Menu           []config.MenuElement
 }
 
 func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLevel int) error {

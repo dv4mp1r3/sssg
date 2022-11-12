@@ -5,14 +5,14 @@ import (
 	"fmt"
 )
 
-type menuElement struct {
+type MenuElement struct {
 	Label string
 	Url   string
 }
 
 type Config struct {
 	Label         string
-	Menu          []menuElement
+	Menu          []MenuElement
 	PostsPerPage  int
 	PreviewLength int
 	SourcePath    string
