@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -15,6 +17,13 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/mitchellh/go-wordwrap"
 )
+
+type pData struct {
+	PaginationData string
+	DrawPagination bool
+	Menu           string
+	Content        string
+}
 
 func listTemplFields(t *template.Template) []string {
 	return listNodeFields(t.Tree.Root, nil)
@@ -48,9 +57,34 @@ func parseTemplate(tObject *template.Template, tContent *string) []string {
 	return l
 }
 
-func GenPageUrls(pageCount int, currentPage int) string {
-	//todo: implement
-	return ""
+func GenPreviews(pageName string, pageTemplate string, posts *[]Post, paginationElements *string, c *config.Config) {
+
+	divs := ""
+	const templateName = "post_preview"
+	var m = make(map[string]any)
+	for _, post := range *posts {
+		if len(post.Content) == 0 {
+			continue
+		}
+		m[templateName] = post
+		divContent := CreatePageFromFile(c, templateName, false, m)
+		contentIndex := strings.Index(divContent, post.Content)
+		if contentIndex >= 0 {
+			previewText := GenPreviewText(post.Content, c)
+			divContent = ReplaceAtIndex(divContent, []rune(previewText), contentIndex, len(post.Content))
+			divs += divContent
+			divs += "\n"
+		}
+	}
+
+	//todo: redo
+	m[templateName] = pData{DrawPagination: true, PaginationData: *paginationElements, Menu: "", Content: divs}
+	pageContent := CreatePage(c, templateName, pageTemplate, false, m)
+	pagePath := path.Join(c.ResultPath, pageName+".html")
+	err := os.WriteFile(pagePath, []byte(pageContent), 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func GenPreviewText(postContent string, c *config.Config) string {
