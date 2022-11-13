@@ -14,5 +14,6 @@
     "previewLength": 15,
     "sourcePath": "./source",
     "resultPath": "./result",
+    "staticPath": "./css",
     "url": "https://domain.com"
 }
