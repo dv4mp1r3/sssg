@@ -5,6 +5,7 @@ import "strings"
 type Category struct {
 	Url   string
 	Label string
+	Path  string
 }
 
 func IsUniqueCategory(c []Category, url *string) bool {

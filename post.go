@@ -67,7 +67,7 @@ func getCtime(fInfo fs.FileInfo) time.Time {
 	return time.Unix(int64(getCtimeSec(stat)), int64(getCtimeNSec(stat)))
 }
 
-func joinFolders(p *Post) string {
+func JoinFolders(p *Post) string {
 	res := ""
 	for _, fld := range p.Folders {
 		res = path.Join(res, fld)
@@ -76,12 +76,12 @@ func joinFolders(p *Post) string {
 }
 
 func GenFullSourcePath(c *config.Config, post *Post) string {
-	res := path.Join(c.SourcePath, "content", joinFolders(post))
+	res := path.Join(c.SourcePath, "content", JoinFolders(post))
 	return path.Join(res, post.Path)
 }
 
 func GenFullDestPath(c *config.Config, post *Post) string {
-	return path.Join(c.ResultPath, joinFolders(post))
+	return path.Join(c.ResultPath, JoinFolders(post))
 }
 
 func GenPostHtml(postPageMd *string) string {
