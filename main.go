@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"sort"
@@ -110,6 +111,16 @@ func tryToUpdateCategories(categories *[]Category, post *Post, c *config.Config)
 	}
 }
 
+func copyStatic(c *config.Config) {
+	source := path.Join(c.SourcePath, c.StaticPath)
+	result := path.Join(c.ResultPath, c.StaticPath)
+	out, err := exec.Command("cp", "-R", source, result).Output()
+	if err != nil {
+		fmt.Printf("%s", err)
+	}
+	fmt.Println(out)
+}
+
 func main() {
 	c := processInput()
 
@@ -141,5 +152,7 @@ func main() {
 		pbc := postsByCategory[categories[idx].Path]
 		writePaginationPages(&pbc, &pageTemplate, &c, categories[idx].Path)
 	}
+
+	copyStatic(&c)
 
 }
