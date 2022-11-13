@@ -14,6 +14,9 @@ func GenPaginationElements(pageCount int, activePage int, c *config.Config) stri
 	elements := ""
 	currentPage := 0
 	m := make(map[string]any)
+	if pageCount <= 1 {
+		return elements
+	}
 
 	const tName = "pagination_element"
 	for currentPage < pageCount {
