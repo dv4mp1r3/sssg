@@ -101,8 +101,8 @@ func writePost(post *Post, categories *[]Category, c *config.Config, pageTemplat
 	return post
 }
 
-func tryToUpdateCategories(categories *[]Category, post *Post) {
-	catUrl := GetCategoryUrlByPost(post)
+func tryToUpdateCategories(categories *[]Category, post *Post, c *config.Config) {
+	catUrl := GetCategoryUrlByPost(post, c)
 	catLabel := GetCategoryNameByPost(post)
 	if needToAddCategory(&catUrl, &catLabel, categories) {
 		c := Category{Url: catUrl, Label: catLabel, Path: JoinFolders(post)}
@@ -129,7 +129,7 @@ func main() {
 	postsByCategory := make(map[string][]Post)
 	for idx, post := range posts {
 		posts[idx] = *writePost(&post, &categories, &c, &pageTemplate)
-		tryToUpdateCategories(&categories, &post)
+		tryToUpdateCategories(&categories, &post, &c)
 		if len(post.Folders) > 0 {
 			pbcKey := JoinFolders(&post)
 			postsByCategory[pbcKey] = append(postsByCategory[pbcKey], post)

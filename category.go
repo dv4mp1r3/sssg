@@ -1,6 +1,10 @@
 package main
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/dv4mp1r3/sssg/config"
+)
 
 type Category struct {
 	Url   string
@@ -17,16 +21,14 @@ func IsUniqueCategory(c []Category, url *string) bool {
 	return true
 }
 
-func GetCategoryUrlByPost(post *Post) string {
+func GetCategoryUrlByPost(post *Post, c *config.Config) string {
 	l := len(post.Folders)
 	if l == 0 {
 		return ""
 	}
-	url := ""
+	url := c.Url
 	for _, folder := range post.Folders {
-		if len(url) > 0 {
-			url += "/"
-		}
+		url += "/"
 		url += strings.TrimSpace(folder)
 	}
 	return url
