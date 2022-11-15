@@ -1,0 +1,19 @@
+<body>
+    {{with .Menu}}
+    <div class="menu">
+        {{range .}}
+            <div class="menu-el">
+                <a href="{{.Url}}">{{.Label}}</a>
+            </div>
+        {{end}}
+    </div>
+    {{end}}
+    <div class="main">
+        {{.Content}}
+    </div>
+    {{if .DrawPagination}}
+    <div class="pagination">
+        {{.PaginationData}}
+    </div>
+    {{end}}
+</body>
