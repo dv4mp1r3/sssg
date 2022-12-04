@@ -10,6 +10,21 @@
             "url": "/about"
         }
     ],
+    "tags": [
+        {
+            "key" : "tag_1",
+            "urls": [
+                "category/post1.md",
+                "category/post2.md"
+            ]
+        },        
+        {
+            "key": "tag2",
+            "urls": [
+                "category/post.md"
+            ]
+        }
+    ],
     "postsPerPage": 3,
     "previewLength": 15,
     "sourcePath": "./source",

@@ -25,15 +25,18 @@ type Post struct {
 	Time    time.Time
 	Url     string
 	Content string
+	Tags    []Tag
 }
 
 type PageData struct {
 	DrawPagination bool
 	Content        string
 	Menu           []config.MenuElement
+	Time           string
+	Tags           []Tag
 }
 
-func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLevel int) error {
+func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLevel int, c *config.Config) error {
 
 	f, err := os.Open(root)
 	if err != nil {
@@ -47,7 +50,7 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 
 	for _, file := range fileInfo {
 		if strings.HasSuffix(file.Name(), ".md") {
-			post := Post{Path: file.Name(), Folders: dirs, Time: getCtime(file)}
+			post := Post{Path: file.Name(), Folders: dirs, Time: getCtime(file), Tags: getPostTags(c, file.Name(), dirs)}
 			*posts = append(*posts, post)
 		}
 
@@ -55,10 +58,29 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 			copyDirs := append(dirs, file.Name())
 			newRoot := filepath.Join(root, file.Name())
 			currentLevel++
-			getPosts(posts, newRoot, copyDirs, maxLevel, currentLevel)
+			getPosts(posts, newRoot, copyDirs, maxLevel, currentLevel, c)
 		}
 	}
 	return nil
+}
+
+func getPostTags(c *config.Config, filename string, dirs []string) []Tag {
+	p := ""
+	result := []Tag{}
+	for _, dir := range dirs {
+		p = path.Join(p, dir)
+	}
+
+	p = path.Join(p, filename)
+	for _, tag := range c.Tags {
+		for _, url := range tag.Urls {
+			if url == p {
+				result = append(result, Tag{Key: tag.Key, Url: fmt.Sprint(c.Url, "/", tag.Key)})
+			}
+		}
+	}
+	return result
+
 }
 
 func getCtime(fInfo fs.FileInfo) time.Time {

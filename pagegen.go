@@ -23,6 +23,7 @@ type pData struct {
 	DrawPagination bool
 	Menu           []config.MenuElement
 	Content        string
+	Time           string
 }
 
 func listTemplFields(t *template.Template) []string {
@@ -78,7 +79,7 @@ func GenPreviews(pageName string, pageTemplate string, posts *[]Post, pagination
 	}
 
 	//todo: redo
-	m[templateName] = pData{DrawPagination: true, PaginationData: *paginationElements, Menu: c.Menu, Content: divs}
+	m[templateName] = pData{DrawPagination: true, PaginationData: *paginationElements, Menu: c.Menu, Content: divs, Time: ""}
 	pageContent := CreatePage(c, templateName, pageTemplate, false, m)
 	pagePath := path.Join(c.ResultPath, pageName+".html")
 	err := os.WriteFile(pagePath, []byte(pageContent), 0644)
@@ -136,7 +137,7 @@ func CreatePage(c *config.Config, templateName string, templateContent string, i
 		}
 		templateObject = template.Must(templateObject.Parse(pageContent))
 		var b bytes.Buffer
-		templateObject.Execute(&b, data[templateName])
+		templateObject.ExecuteTemplate(&b, templateName, data[templateName])
 		return b.String()
 	}
 

@@ -5,6 +5,11 @@ import (
 	"fmt"
 )
 
+type Tag struct {
+	Key  string
+	Urls []string
+}
+
 type MenuElement struct {
 	Label string
 	Url   string
@@ -19,6 +24,7 @@ type Config struct {
 	ResultPath    string
 	StaticPath    string
 	Url           string
+	Tags          []Tag
 }
 
 var c Config

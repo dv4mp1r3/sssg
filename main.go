@@ -70,6 +70,7 @@ func writePaginationPages(posts *[]Post, pageTemplate *string, c *config.Config,
 
 func writePost(post *Post, categories *[]Category, c *config.Config, pageTemplate *string) *Post {
 	const templateName = "post"
+
 	fmt.Println(post.Path)
 	fp := GenFullSourcePath(c, post)
 	cnt := common.ReadFile(fp)
@@ -80,8 +81,10 @@ func writePost(post *Post, categories *[]Category, c *config.Config, pageTemplat
 
 	_html := GenPostHtml(&cnt)
 	m := make(map[string]any)
-	m[templateName] = PageData{DrawPagination: false, Content: _html, Menu: c.Menu}
-	postPage := CreatePage(c, templateName, *pageTemplate, false, m)
+	m[templateName] = PageData{DrawPagination: false, Content: _html, Menu: c.Menu, Time: "", Tags: post.Tags}
+	//todo: убрать повторный рендеринг шаблона
+	tmp := CreatePageFromFile(c, "page", true, m)
+	postPage := CreatePage(c, templateName, tmp, false, m)
 
 	destPath := GenFullDestPath(c, post)
 	err := os.MkdirAll(destPath, 0755)
@@ -114,6 +117,7 @@ func tryToUpdateCategories(categories *[]Category, post *Post, c *config.Config)
 func copyStatic(c *config.Config) {
 	source := path.Join(c.SourcePath, c.StaticPath)
 	result := path.Join(c.ResultPath, c.StaticPath)
+	exec.Command("rm", "-rf", result).Output()
 	out, err := exec.Command("cp", "-R", source, result).Output()
 	if err != nil {
 		fmt.Printf("%s", err)
@@ -129,7 +133,7 @@ func main() {
 	pageTemplate := CreatePageFromFile(&c, "page", true, nil)
 
 	var posts []Post
-	err := getPosts(&posts, filepath.Join(c.SourcePath, "content"), []string{}, 3, 1)
+	err := getPosts(&posts, filepath.Join(c.SourcePath, "content"), []string{}, 3, 1, &c)
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].Time.Before(posts[j].Time)
 	})
