@@ -62,18 +62,16 @@ func writePaginationPages(posts *[]Post, tplParam template.Template, c *config.C
 		previewDivs, pagePath := GenPreviews(
 			pageName,
 			&pagePosts,
-			&paginationElements,
 			c,
 			tplParam,
 		)
 		writePage(
 			PageData{
-				DrawPagination: false,
 				Content:        previewDivs,
 				Menu:           c.Menu,
 				Time:           "",
 				Tags:           []Tag{},
-				PaginationData: []string{},
+				PaginationData: paginationElements,
 			},
 			pagePath,
 			&tplParam,
@@ -118,12 +116,11 @@ func genPostFile(post *Post, categories *[]Category, c *config.Config, tplParam 
 	)
 	writePage(
 		PageData{
-			DrawPagination: false,
 			Content:        _html,
 			Menu:           c.Menu,
 			Time:           "",
 			Tags:           post.Tags,
-			PaginationData: []string{},
+			PaginationData: []PaginationElement{},
 		},
 		destPath,
 		tplParam,

@@ -29,12 +29,11 @@ type Post struct {
 }
 
 type PageData struct {
-	DrawPagination bool
 	Content        string
 	Menu           []config.MenuElement
 	Time           string
 	Tags           []Tag
-	PaginationData []string
+	PaginationData []PaginationElement
 }
 
 func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLevel int, c *config.Config) error {

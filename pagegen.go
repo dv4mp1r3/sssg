@@ -18,7 +18,7 @@ type previewData struct {
 	Content string
 }
 
-func GenPreviews(pageName string, posts *[]Post, paginationElements *string, c *config.Config, tpl template.Template) (string, string) {
+func GenPreviews(pageName string, posts *[]Post, c *config.Config, tpl template.Template) (string, string) {
 
 	divs := ""
 	const templateName = "post_preview"

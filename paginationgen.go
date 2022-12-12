@@ -10,15 +10,13 @@ type PaginationElement struct {
 	Value  int
 }
 
-func GenPaginationElements(pageCount int, activePage int, c *config.Config) string {
-	elements := ""
+func GenPaginationElements(pageCount int, activePage int, c *config.Config) []PaginationElement {
 	currentPage := 0
-	m := make(map[string]any)
+	m := []PaginationElement{}
 	if pageCount <= 1 {
-		return elements
+		return m
 	}
 
-	const tName = "pagination_element"
 	for currentPage < pageCount {
 		var t string
 		if currentPage == activePage {
@@ -26,9 +24,8 @@ func GenPaginationElements(pageCount int, activePage int, c *config.Config) stri
 		} else {
 			t = "inactive"
 		}
+		m = append(m, PaginationElement{Type: t, Custom: "", Value: currentPage})
 		currentPage++
-		m[tName] = PaginationElement{Type: t, Custom: "", Value: currentPage}
-		//elements += CreatePageFromFile(c, tName, false, m)
 	}
-	return elements
+	return m
 }
