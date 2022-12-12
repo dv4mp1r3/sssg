@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/dv4mp1r3/ovpngen/common"
 	"github.com/dv4mp1r3/sssg/config"
@@ -33,7 +35,7 @@ func needToAddCategory(url *string, label *string, categories *[]Category) bool 
 	return len(*url) > 0 && len(*label) > 0 && IsUniqueCategory(*categories, url)
 }
 
-func writePaginationPages(posts *[]Post, pageTemplate *string, c *config.Config, customPath string) {
+func writePaginationPages(posts *[]Post, tplParam template.Template, c *config.Config, customPath string) {
 	pLen := len(*posts)
 	pages := pLen / c.PostsPerPage
 	if pages == 0 && pLen > 0 {
@@ -57,19 +59,49 @@ func writePaginationPages(posts *[]Post, pageTemplate *string, c *config.Config,
 		if customPath != "" {
 			pageName = path.Join(customPath, pageName)
 		}
-		GenPreviews(
+		previewDivs, pagePath := GenPreviews(
 			pageName,
-			*pageTemplate,
 			&pagePosts,
 			&paginationElements,
 			c,
+			tplParam,
 		)
-
+		writePage(
+			PageData{
+				DrawPagination: false,
+				Content:        previewDivs,
+				Menu:           c.Menu,
+				Time:           "",
+				Tags:           []Tag{},
+				PaginationData: []string{},
+			},
+			pagePath,
+			&tplParam,
+		)
 	}
 }
 
-func writePost(post *Post, categories *[]Category, c *config.Config, pageTemplate *string) *Post {
-	const templateName = "post"
+func writePage(pgd PageData, destPath string, tplParam *template.Template) string {
+	if destPath == "" {
+		return destPath
+	}
+
+	var b bytes.Buffer
+	tplParam.ExecuteTemplate(
+		&b,
+		genTemplateName("page"),
+		pgd,
+	)
+
+	err := os.WriteFile(destPath, b.Bytes(), 0644)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	return destPath
+}
+
+func genPostFile(post *Post, categories *[]Category, c *config.Config, tplParam *template.Template) *Post {
 
 	fmt.Println(post.Path)
 	fp := GenFullSourcePath(c, post)
@@ -80,29 +112,36 @@ func writePost(post *Post, categories *[]Category, c *config.Config, pageTemplat
 	}
 
 	_html := GenPostHtml(&cnt)
-	m := make(map[string]any)
-	m[templateName] = PageData{DrawPagination: false, Content: _html, Menu: c.Menu, Time: "", Tags: post.Tags}
-	//todo: убрать повторный рендеринг шаблона
-	tmp := CreatePageFromFile(c, "page", true, m)
-	postPage := CreatePage(c, templateName, tmp, false, m)
-
-	destPath := GenFullDestPath(c, post)
-	err := os.MkdirAll(destPath, 0755)
-	if err != nil {
-		fmt.Println(err)
-		return post
-	}
-
-	destPath = path.Join(destPath, strings.Replace(post.Path, ".md", ".html", 1))
-	err = os.WriteFile(destPath, []byte(postPage), 0644)
-	if err != nil {
-		fmt.Println(err)
-	}
+	destPath := makePagePath(
+		GenFullDestPath(c, post),
+		strings.Replace(post.Path, ".md", ".html", 1),
+	)
+	writePage(
+		PageData{
+			DrawPagination: false,
+			Content:        _html,
+			Menu:           c.Menu,
+			Time:           "",
+			Tags:           post.Tags,
+			PaginationData: []string{},
+		},
+		destPath,
+		tplParam,
+	)
 
 	post.Content = _html
 	post.Url = GenPostUrl(c, &destPath)
 
 	return post
+}
+
+func makePagePath(destPath string, postFilename string) string {
+	err := os.MkdirAll(destPath, 0755)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	return path.Join(destPath, postFilename)
 }
 
 func tryToUpdateCategories(categories *[]Category, post *Post, c *config.Config) {
@@ -125,13 +164,16 @@ func copyStatic(c *config.Config) {
 	fmt.Println(out)
 }
 
+func genTemplateName(name string) string {
+	return name + ".html"
+}
+
 func main() {
 	c := processInput()
 
 	var categories []Category
 
-	pageTemplate := CreatePageFromFile(&c, "page", true, nil)
-
+	var a, _ = template.ParseGlob(path.Join(c.SourcePath, "*.html"))
 	var posts []Post
 	err := getPosts(&posts, filepath.Join(c.SourcePath, "content"), []string{}, 3, 1, &c)
 	sort.Slice(posts, func(i, j int) bool {
@@ -143,7 +185,7 @@ func main() {
 
 	postsByCategory := make(map[string][]Post)
 	for idx, post := range posts {
-		posts[idx] = *writePost(&post, &categories, &c, &pageTemplate)
+		posts[idx] = *genPostFile(&post, &categories, &c, a)
 		tryToUpdateCategories(&categories, &post, &c)
 		if len(post.Folders) > 0 {
 			pbcKey := JoinFolders(&post)
@@ -151,10 +193,10 @@ func main() {
 		}
 	}
 
-	writePaginationPages(&posts, &pageTemplate, &c, "")
+	writePaginationPages(&posts, *a, &c, "")
 	for idx := range categories {
 		pbc := postsByCategory[categories[idx].Path]
-		writePaginationPages(&pbc, &pageTemplate, &c, categories[idx].Path)
+		writePaginationPages(&pbc, *a, &c, categories[idx].Path)
 	}
 
 	copyStatic(&c)

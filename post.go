@@ -34,6 +34,7 @@ type PageData struct {
 	Menu           []config.MenuElement
 	Time           string
 	Tags           []Tag
+	PaginationData []string
 }
 
 func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLevel int, c *config.Config) error {

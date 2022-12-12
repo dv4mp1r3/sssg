@@ -11,9 +11,13 @@
     <div class="main">
         {{.Content}}
     </div>
-    {{if .DrawPagination}}
+    {{with .PaginationData}}
     <div class="pagination">
-        {{.PaginationData}}
+        {{range .}}
+        <div class="{{.Type}}">
+            {{.Value}}
+        </div>
+        {{end}}
     </div>
     {{end}}
 </body>

@@ -28,7 +28,7 @@ func GenPaginationElements(pageCount int, activePage int, c *config.Config) stri
 		}
 		currentPage++
 		m[tName] = PaginationElement{Type: t, Custom: "", Value: currentPage}
-		elements += CreatePageFromFile(c, tName, false, m)
+		//elements += CreatePageFromFile(c, tName, false, m)
 	}
 	return elements
 }
