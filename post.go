@@ -29,7 +29,6 @@ type Post struct {
 
 type PageData struct {
 	Post
-	Menu           []config.MenuElement
 	PublishDate    string
 	PaginationData []PaginationElement
 }

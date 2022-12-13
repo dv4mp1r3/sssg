@@ -70,9 +70,9 @@ func writePaginationPages(posts *[]Post, tplParam template.Template, c *config.C
 				Post: Post{
 					GeneralHtmlData: GeneralHtmlData{
 						Content: previewDivs,
+						Config:  *c,
 					},
 				},
-				Menu:           c.Menu,
 				PaginationData: paginationElements,
 			},
 			pagePath,
@@ -117,9 +117,9 @@ func genPostFile(post *Post, categories *[]Category, c *config.Config, tplParam 
 		strings.Replace(post.Path, ".md", ".html", 1),
 	)
 	post.GeneralHtmlData.Content = _html
+	post.GeneralHtmlData.Config = *c
 	writePage(
 		PageData{
-			Menu:           c.Menu,
 			PaginationData: []PaginationElement{},
 			Post:           *post,
 			PublishDate:    "",

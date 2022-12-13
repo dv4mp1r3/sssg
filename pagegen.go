@@ -16,6 +16,7 @@ import (
 type GeneralHtmlData struct {
 	Url     string
 	Content string
+	Config  config.Config
 }
 
 func GenPreviews(pageName string, posts *[]Post, c *config.Config, tpl template.Template) (string, string) {
