@@ -13,7 +13,7 @@ import (
 	"github.com/mitchellh/go-wordwrap"
 )
 
-type previewData struct {
+type GeneralHtmlData struct {
 	Url     string
 	Content string
 }
@@ -35,7 +35,7 @@ func GenPreviews(pageName string, posts *[]Post, c *config.Config, tpl template.
 		tpl.ExecuteTemplate(
 			&b,
 			fmt.Sprint(templateName, ".html"),
-			previewData{
+			GeneralHtmlData{
 				Url:     post.Url,
 				Content: previewText,
 			},

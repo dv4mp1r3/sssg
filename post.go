@@ -20,19 +20,17 @@ import (
 )
 
 type Post struct {
+	GeneralHtmlData
 	Path    string
 	Folders []string
 	Time    time.Time
-	Url     string
-	Content string
 	Tags    []Tag
 }
 
 type PageData struct {
-	Content        string
+	Post
 	Menu           []config.MenuElement
-	Time           string
-	Tags           []Tag
+	PublishDate    string
 	PaginationData []PaginationElement
 }
 
