@@ -104,7 +104,7 @@ func GenFullDestPath(c *config.Config, post *Post) string {
 }
 
 func GenPostHtml(postPageMd *string) string {
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.Attributes
 	opts := html.RendererOptions{
 		Flags:          html.UseXHTML,
 		RenderNodeHook: renderHookDropCodeBlock,

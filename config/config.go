@@ -16,15 +16,17 @@ type MenuElement struct {
 }
 
 type Config struct {
-	Label         string
-	Menu          []MenuElement
-	PostsPerPage  int
-	PreviewLength int
-	SourcePath    string
-	ResultPath    string
-	StaticPath    string
-	Url           string
-	Tags          []Tag
+	Label                  string
+	Menu                   []MenuElement
+	PostsPerPage           int
+	PreviewLength          int
+	SourcePath             string
+	ResultPath             string
+	StaticPath             string
+	Url                    string
+	Tags                   []Tag
+	PreviewByPageBreak     bool
+	PreviewPageBreakString string
 }
 
 var c Config

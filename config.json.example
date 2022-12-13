@@ -26,6 +26,8 @@
         }
     ],
     "postsPerPage": 3,
+    "previewByPageBreak": false,
+    "previewPageBreakString": "<!--pb-->",
     "previewLength": 15,
     "sourcePath": "./source",
     "resultPath": "./result",
