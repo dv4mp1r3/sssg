@@ -15,7 +15,7 @@
     <div class="pagination">
         {{range .}}
         <div class="{{.Type}}">
-            {{.Value}}
+            <a href="{{.Custom}}">{{.Type}}</a>
         </div>
         {{end}}
     </div>

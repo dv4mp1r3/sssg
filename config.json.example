@@ -29,6 +29,7 @@
     "previewByPageBreak": false,
     "previewPageBreakString": "<!--pb-->",
     "previewLength": 15,
+    "maxTwoPaginationButtons": true,
     "sourcePath": "./source",
     "resultPath": "./result",
     "staticPath": "./css",
