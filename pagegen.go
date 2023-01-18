@@ -36,9 +36,12 @@ func GenPreviews(pageName string, posts *[]Post, c *config.Config, tpl template.
 		tpl.ExecuteTemplate(
 			&b,
 			fmt.Sprint(templateName, ".html"),
-			GeneralHtmlData{
-				Url:     post.Url,
-				Content: previewText,
+			Post{
+				GeneralHtmlData: GeneralHtmlData{
+					Url:     post.Url,
+					Content: previewText,
+					Config:  *c,
+				},
 			},
 		)
 
