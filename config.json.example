@@ -10,21 +10,10 @@
             "url": "/about"
         }
     ],
-    "tags": [
-        {
-            "key" : "tag_1",
-            "urls": [
-                "category/post1.md",
-                "category/post2.md"
-            ]
-        },        
-        {
-            "key": "tag2",
-            "urls": [
-                "category/post.md"
-            ]
-        }
-    ],
+    "tags": {
+        "category1/post1.md" : ["tag1", "tag2"],
+        "category2/post1.md" : ["tag3", "tag2"],
+    },
     "postsPerPage": 3,
     "previewByPageBreak": false,
     "previewPageBreakString": "<!--pb-->",

@@ -24,7 +24,7 @@ type Post struct {
 	Path    string
 	Folders []string
 	Time    time.Time
-	Tags    []Tag
+	Tags    []string
 }
 
 type PageData struct {
@@ -61,22 +61,19 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 	return nil
 }
 
-func getPostTags(c *config.Config, filename string, dirs []string) []Tag {
+func getPostTags(c *config.Config, filename string, dirs []string) []string {
 	p := ""
-	result := []Tag{}
 	for _, dir := range dirs {
 		p = path.Join(p, dir)
 	}
 
 	p = path.Join(p, filename)
-	for _, tag := range c.Tags {
-		for _, url := range tag.Urls {
-			if url == p {
-				result = append(result, Tag{Key: tag.Key, Url: fmt.Sprint(c.Url, "/", tag.Key)})
-			}
+	for url, _ := range c.Tags {
+		if url == p {
+			return c.Tags[url]
 		}
 	}
-	return result
+	return []string{}
 
 }
 
