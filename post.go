@@ -47,7 +47,12 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 
 	for _, file := range fileInfo {
 		if strings.HasSuffix(file.Name(), ".md") {
-			post := Post{Path: file.Name(), Folders: dirs, Time: getCtime(file), Tags: getPostTags(c, file.Name(), dirs)}
+			post := Post{
+				Path:    file.Name(),
+				Folders: dirs,
+				Time:    getCtime(file),
+				Tags:    GetPostTags(c, file.Name(), dirs),
+			}
 			*posts = append(*posts, post)
 		}
 
@@ -59,22 +64,6 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 		}
 	}
 	return nil
-}
-
-func getPostTags(c *config.Config, filename string, dirs []string) []string {
-	p := ""
-	for _, dir := range dirs {
-		p = path.Join(p, dir)
-	}
-
-	p = path.Join(p, filename)
-	for url, _ := range c.Tags {
-		if url == p {
-			return c.Tags[url]
-		}
-	}
-	return []string{}
-
 }
 
 func getCtime(fInfo fs.FileInfo) time.Time {
