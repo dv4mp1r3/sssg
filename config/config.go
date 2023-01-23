@@ -24,7 +24,7 @@ type Config struct {
 	ResultPath              string
 	StaticPath              string
 	Url                     string
-	Tags                    []Tag
+	Tags                    map[string][]string
 	PreviewByPageBreak      bool
 	PreviewPageBreakString  string
 	MaxTwoPaginationButtons bool

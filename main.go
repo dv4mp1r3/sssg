@@ -186,16 +186,25 @@ func main() {
 	for idx, post := range posts {
 		posts[idx] = *genPostFile(&post, &categories, &c, a)
 		tryToUpdateCategories(&categories, &post, &c)
+		pbcKey := ""
 		if len(post.Folders) > 0 {
-			pbcKey := JoinFolders(&post)
+			pbcKey = JoinFolders(&post)
 			postsByCategory[pbcKey] = append(postsByCategory[pbcKey], post)
 		}
+		posts[idx].Tags = GetPostTags(&c, path.Join(pbcKey, posts[idx].Path))
+		TryToUpdateTagInfo(posts[idx].Tags, &post)
 	}
 
 	writePaginationPages(&posts, *a, &c, "")
 	for idx := range categories {
 		pbc := postsByCategory[categories[idx].Path]
 		writePaginationPages(&pbc, *a, &c, categories[idx].Path)
+	}
+
+	for tag := range GetUniqueTags() {
+		pbt := postsByTag[tag]
+		makePagePath(path.Join(c.ResultPath, tag), "")
+		writePaginationPages(&pbt, *a, &c, tag)
 	}
 
 	copyStatic(&c)

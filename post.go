@@ -24,7 +24,7 @@ type Post struct {
 	Path    string
 	Folders []string
 	Time    time.Time
-	Tags    []Tag
+	Tags    []string
 }
 
 type PageData struct {
@@ -47,7 +47,12 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 
 	for _, file := range fileInfo {
 		if strings.HasSuffix(file.Name(), ".md") {
-			post := Post{Path: file.Name(), Folders: dirs, Time: getCtime(file), Tags: getPostTags(c, file.Name(), dirs)}
+			post := Post{
+				Path:    file.Name(),
+				Folders: dirs,
+				Time:    getCtime(file),
+				//Tags:    GetPostTags(c, file.Name(), dirs),
+			}
 			*posts = append(*posts, post)
 		}
 
@@ -59,25 +64,6 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 		}
 	}
 	return nil
-}
-
-func getPostTags(c *config.Config, filename string, dirs []string) []Tag {
-	p := ""
-	result := []Tag{}
-	for _, dir := range dirs {
-		p = path.Join(p, dir)
-	}
-
-	p = path.Join(p, filename)
-	for _, tag := range c.Tags {
-		for _, url := range tag.Urls {
-			if url == p {
-				result = append(result, Tag{Key: tag.Key, Url: fmt.Sprint(c.Url, "/", tag.Key)})
-			}
-		}
-	}
-	return result
-
 }
 
 func getCtime(fInfo fs.FileInfo) time.Time {
