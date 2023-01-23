@@ -51,7 +51,7 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 				Path:    file.Name(),
 				Folders: dirs,
 				Time:    getCtime(file),
-				Tags:    GetPostTags(c, file.Name(), dirs),
+				//Tags:    GetPostTags(c, file.Name(), dirs),
 			}
 			*posts = append(*posts, post)
 		}
