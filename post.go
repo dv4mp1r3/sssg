@@ -59,8 +59,7 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 		if file.IsDir() && currentLevel <= maxLevel {
 			copyDirs := append(dirs, file.Name())
 			newRoot := filepath.Join(root, file.Name())
-			currentLevel++
-			getPosts(posts, newRoot, copyDirs, maxLevel, currentLevel, c)
+			getPosts(posts, newRoot, copyDirs, maxLevel, currentLevel+1, c)
 		}
 	}
 	return nil
