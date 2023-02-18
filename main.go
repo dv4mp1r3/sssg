@@ -40,6 +40,8 @@ func writePaginationPages(posts *[]Post, tplParam template.Template, c *config.C
 	pages := pLen / c.PostsPerPage
 	if pages == 0 && pLen > 0 {
 		pages = 1
+	} else if pages > 1 {
+		pages += 1
 	}
 
 	currentPage := 0
