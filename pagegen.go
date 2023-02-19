@@ -42,7 +42,10 @@ func GenPreviews(pageName string, posts *[]Post, c *config.Config, tpl template.
 					Content: previewText,
 					Config:  *c,
 				},
-				Tags: post.Tags,
+				Tags:    post.Tags,
+				Folders: post.Folders,
+				Time:    post.Time,
+				Path:    post.Path,
 			},
 		)
 
