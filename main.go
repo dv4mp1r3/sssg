@@ -178,7 +178,7 @@ func main() {
 	var posts []Post
 	err := getPosts(&posts, filepath.Join(c.SourcePath, "content"), []string{}, 3, 1, &c)
 	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].Time.Before(posts[j].Time)
+		return posts[i].Time.After(posts[j].Time)
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -200,11 +200,17 @@ func main() {
 	writePaginationPages(&posts, *a, &c, "")
 	for idx := range categories {
 		pbc := postsByCategory[categories[idx].Path]
+		sort.Slice(pbc, func(i, j int) bool {
+			return pbc[i].Time.After(pbc[j].Time)
+		})
 		writePaginationPages(&pbc, *a, &c, categories[idx].Path)
 	}
 
 	for tag := range GetUniqueTags() {
 		pbt := postsByTag[tag]
+		sort.Slice(pbt, func(i, j int) bool {
+			return pbt[i].Time.After(pbt[j].Time)
+		})
 		makePagePath(path.Join(c.ResultPath, tag), "")
 		writePaginationPages(&pbt, *a, &c, tag)
 	}

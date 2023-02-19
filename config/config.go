@@ -15,6 +15,11 @@ type MenuElement struct {
 	Url   string
 }
 
+type PostDates struct {
+	Layout      string
+	CustomDates map[string]string
+}
+
 type Config struct {
 	Label                   string
 	Menu                    []MenuElement
@@ -25,6 +30,7 @@ type Config struct {
 	StaticPath              string
 	Url                     string
 	Tags                    map[string][]string
+	PostDates               PostDates
 	PreviewByPageBreak      bool
 	PreviewPageBreakString  string
 	MaxTwoPaginationButtons bool
