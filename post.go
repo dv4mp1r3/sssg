@@ -50,9 +50,10 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 			post := Post{
 				Path:    file.Name(),
 				Folders: dirs,
-				Time:    getCtime(file),
 				//Tags:    GetPostTags(c, file.Name(), dirs),
 			}
+			pathInCategory := path.Join(JoinFolders(&post), file.Name())
+			post.Time = getPostTime(pathInCategory, file, c)
 			*posts = append(*posts, post)
 		}
 
@@ -63,6 +64,16 @@ func getPosts(posts *[]Post, root string, dirs []string, maxLevel int, currentLe
 		}
 	}
 	return nil
+}
+
+func getPostTime(key string, fInfo fs.FileInfo, c *config.Config) time.Time {
+	if dateVal, ok := c.PostDates.CustomDates[key]; ok {
+		t, err := time.Parse(c.PostDates.Layout, dateVal)
+		if err == nil {
+			return t
+		}
+	}
+	return getCtime(fInfo)
 }
 
 func getCtime(fInfo fs.FileInfo) time.Time {
