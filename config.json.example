@@ -19,7 +19,7 @@
         "customDates": {
             "category1/post1.md": "2020-01-01 00:00:00"
         }
-     }
+     },
     "postsPerPage": 3,
     "previewByPageBreak": false,
     "previewPageBreakString": "<!--pb-->",
