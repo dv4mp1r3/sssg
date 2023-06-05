@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"text/template"
@@ -157,12 +158,27 @@ func tryToUpdateCategories(categories *[]Category, post *Post, c *config.Config)
 func copyStatic(c *config.Config) {
 	source := path.Join(c.SourcePath, c.StaticPath)
 	result := path.Join(c.ResultPath, c.StaticPath)
-	exec.Command("rm", "-rf", result).Output()
-	out, err := exec.Command("cp", "-R", source, result).Output()
-	if err != nil {
-		fmt.Printf("%s", err)
+	if runtime.GOOS == "windows" {
+		exec.Command("rmdir", "/s", result).Output()
+		source = winPathFormat(source)
+		result = winPathFormat(result)
+		out, err := exec.Command("xcopy", source, result, "/E", "/H").Output()
+		if err != nil {
+			fmt.Printf("%s", err)
+		}
+		fmt.Println(out)
+	} else {
+		exec.Command("rm", "-rf", result).Output()
+		out, err := exec.Command("cp", "-R", source, result).Output()
+		if err != nil {
+			fmt.Printf("%s", err)
+		}
+		fmt.Println(out)
 	}
-	fmt.Println(out)
+}
+
+func winPathFormat(path string) string {
+	return fmt.Sprintf(".\\%s\\", strings.Replace(path, "/", "\\", 1))
 }
 
 func genTemplateName(name string) string {

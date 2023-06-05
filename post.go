@@ -8,7 +8,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/dv4mp1r3/sssg/config"
@@ -74,12 +73,6 @@ func getPostTime(key string, fInfo fs.FileInfo, c *config.Config) time.Time {
 		}
 	}
 	return getCtime(fInfo)
-}
-
-func getCtime(fInfo fs.FileInfo) time.Time {
-
-	stat := fInfo.Sys().(*syscall.Stat_t)
-	return time.Unix(int64(getCtimeSec(stat)), int64(getCtimeNSec(stat)))
 }
 
 func JoinFolders(p *Post) string {
