@@ -12,14 +12,14 @@
     ],
     "tags": {
         "category1/post1.md" : ["tag1", "tag2"],
-        "category2/post1.md" : ["tag3", "tag2"],
+        "category2/post1.md" : ["tag3", "tag2"]
     },
      "postDates": {
         "layout": "2006-01-02 15:04:05",
         "customDates": {
             "category1/post1.md": "2020-01-01 00:00:00"
         }
-     }
+     },
     "postsPerPage": 3,
     "previewByPageBreak": false,
     "previewPageBreakString": "<!--pb-->",
