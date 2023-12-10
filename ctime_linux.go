@@ -1,7 +1,9 @@
 package main
 
 import (
+	"io/fs"
 	"syscall"
+	"time"
 )
 
 func getCtime(fInfo fs.FileInfo) time.Time {
