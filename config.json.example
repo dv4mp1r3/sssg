@@ -25,7 +25,7 @@
     "previewPageBreakString": "<!--pb-->",
     "previewLength": 15,
     "maxTwoPaginationButtons": true,
-    "sourcePath": "./source",
+    "sourcePath": "./source.example",
     "resultPath": "./result",
     "staticPath": "./css",
     "url": "https://domain.com"
