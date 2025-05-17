@@ -6,10 +6,12 @@ RUN go mod download \
 
 
 FROM gcr.io/distroless/static-debian12:latest AS production
+ARG UID=1000
+ARG GID=1000
 WORKDIR /app
 COPY --from=busybox:1.37.0-uclibc /bin/busybox /bin/busybox
 COPY --from=busybox:1.37.0-uclibc /bin/cp       /bin/cp
 COPY --from=busybox:1.37.0-uclibc /bin/rm       /bin/rm
 COPY --from=build /app/sssg .
-
+USER ${UID}:${GID}
 ENTRYPOINT ["./sssg"]

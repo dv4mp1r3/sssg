@@ -17,6 +17,11 @@ Linux или MACOS, go 1.18 или выше
 ```
 docker build -t sssg:1.0 .
 ```
+Сборка образа с кастомным пользователем (по умолчанию UID/GID=1000):
+```
+docker build --build-arg UID=1234 --build-arg GID=1234 -t sssg:1.0 .
+```
+
 Пример генерации на основе каталога source.example
 ```
 docker run -v "$(pwd)/source.example":/app/data:rw sssg:1.0 -c /app/data/config.json
