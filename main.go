@@ -207,10 +207,12 @@ func main() {
 		pbcKey := ""
 		if len(post.Folders) > 0 {
 			pbcKey = JoinFolders(&post)
-			postsByCategory[pbcKey] = append(postsByCategory[pbcKey], post)
 		}
 		posts[idx].Tags = GetPostTags(&c, path.Join(pbcKey, posts[idx].Path))
 		TryToUpdateTagInfo(posts[idx].Tags, &post)
+		if len(post.Folders) > 0 {
+			postsByCategory[pbcKey] = append(postsByCategory[pbcKey], post)
+		}
 	}
 
 	writePaginationPages(&posts, *a, &c, "")

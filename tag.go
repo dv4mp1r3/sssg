@@ -23,6 +23,7 @@ func TryToUpdateTagInfo(tags []string, post *Post) {
 		if postsByTag[tag] == nil {
 			postsByTag[tag] = []Post{}
 		}
+		post.Tags = tags
 		postsByTag[tag] = append(postsByTag[tag], *post)
 	}
 }
