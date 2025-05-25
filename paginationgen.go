@@ -27,35 +27,38 @@ func hasNextPage(currentPage int, pageCount int) bool {
 	return pageCount-currentPage >= 2
 }
 
-func genPageUrl(c *config.Config, val int) string {
-	if val == 1 {
-		return fmt.Sprintf("%s/%s.html", c.Url, "index")
+func genPageUrl(c *config.Config, val int, customPath string) string {
+	if customPath != "" {
+		customPath += "/"
 	}
-	return fmt.Sprintf("%s/%d.html", c.Url, val)
+	if val == 1 {
+		return fmt.Sprintf("%s/%s%s.html", c.Url, customPath, "index")
+	}
+	return fmt.Sprintf("%s/%s%d.html", c.Url, customPath, val)
 }
 
-func genMaxTwoPaginationButtons(pageCount int, activePage int, c *config.Config, m []PaginationElement) []PaginationElement {
+func genMaxTwoPaginationButtons(pageCount int, activePage int, c *config.Config, m []PaginationElement, customPath string) []PaginationElement {
 	hnp := hasNextPage(activePage, pageCount)
 	ifp := isFirstPage(activePage)
 	val := 0
 	if ifp && hnp {
 		val = activePage + 2
-		m = append(m, PaginationElement{Type: nextType, Custom: genPageUrl(c, val), Value: val})
+		m = append(m, PaginationElement{Type: nextType, Custom: genPageUrl(c, val, customPath), Value: val})
 	} else if isLastPage(activePage, pageCount) {
 		val = activePage
-		m = append(m, PaginationElement{Type: prevType, Custom: genPageUrl(c, val), Value: val})
+		m = append(m, PaginationElement{Type: prevType, Custom: genPageUrl(c, val, customPath), Value: val})
 	} else {
 		val = activePage
-		m = append(m, PaginationElement{Type: prevType, Custom: genPageUrl(c, val), Value: val})
+		m = append(m, PaginationElement{Type: prevType, Custom: genPageUrl(c, val, customPath), Value: val})
 		if hnp {
 			val = activePage + 2
-			m = append(m, PaginationElement{Type: nextType, Custom: genPageUrl(c, val), Value: val})
+			m = append(m, PaginationElement{Type: nextType, Custom: genPageUrl(c, val, customPath), Value: val})
 		}
 	}
 	return m
 }
 
-func genAllPaginationButtons(pageCount int, activePage int, c *config.Config, m []PaginationElement) []PaginationElement {
+func genAllPaginationButtons(pageCount int, activePage int, c *config.Config, m []PaginationElement, customPath string) []PaginationElement {
 	currentPage := 0
 	for currentPage < pageCount {
 		var t string
@@ -70,7 +73,7 @@ func genAllPaginationButtons(pageCount int, activePage int, c *config.Config, m 
 	return m
 }
 
-func GenPaginationElements(pageCount int, activePage int, c *config.Config) []PaginationElement {
+func GenPaginationElements(pageCount int, activePage int, c *config.Config, customPath string) []PaginationElement {
 
 	m := []PaginationElement{}
 	if pageCount <= 1 {
@@ -78,8 +81,8 @@ func GenPaginationElements(pageCount int, activePage int, c *config.Config) []Pa
 	}
 
 	if c.MaxTwoPaginationButtons {
-		return genMaxTwoPaginationButtons(pageCount, activePage, c, m)
+		return genMaxTwoPaginationButtons(pageCount, activePage, c, m, customPath)
 	}
-	return genAllPaginationButtons(pageCount, activePage, c, m)
+	return genAllPaginationButtons(pageCount, activePage, c, m, customPath)
 
 }

@@ -57,7 +57,7 @@ func writePaginationPages(posts *[]Post, tplParam template.Template, c *config.C
 		if currentPage > 0 {
 			pageName = fmt.Sprint(currentPage + 1)
 		}
-		paginationElements := GenPaginationElements(pages, currentPage, c)
+		paginationElements := GenPaginationElements(pages, currentPage, c, customPath)
 		currentPage++
 		if customPath != "" {
 			pageName = path.Join(customPath, pageName)
